@@ -10,15 +10,22 @@ const Profile = () => {
   const partials = useDynamicPartials({
     partialModules,
     user,
-    refetchUser: refetch,
-    reverseOrder: false,
+    reverseOrder: false, 
   });
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return <Loading />;
   }
 
-  return <div className="flex flex-col gap-3 max-w-3xl">{partials}</div>;
+  return (
+    <div className="flex flex-col gap-3 max-w-3xl">
+      {partials.map(({ key, Component }) => (
+        <div key={key}>
+          <Component user={user} refetchUser={refetch} />
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default Profile;

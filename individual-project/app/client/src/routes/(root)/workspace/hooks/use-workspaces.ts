@@ -1,7 +1,13 @@
-import { useApiMutation, useApiQuery } from "@/hooks/hook";
+import { toast } from "sonner";
 import { API } from "@/lib/config";
 import type { Workspace } from "@/types/workspace";
-import { toast } from "sonner";
+import type { ApiSuccessResponse } from "@/types/api";
+import { useApiMutation, useApiQuery } from "@/hooks/hook";
+import type { UpdateWorkspaceSchemaType } from "@/utils/schemas/workspace/workspace.schema";
+import type { NavigateFunction } from "react-router-dom";
+import { ROUTES } from "@/lib/router-paths";
+
+export type UpdateWorkspaceFn = (data: UpdateWorkspaceSchemaType) => Promise<ApiSuccessResponse<Workspace>>;
 
 export const useUserWorkspaces = () => {
   return useApiQuery<Workspace[]>(
@@ -30,8 +36,7 @@ export const useUpdateWorkspace = (workspaceId: number) => {
     API.ENDPOINTS.WORKSPACE.Id(workspaceId),
     {
       invalidateQueries: [["workspace", workspaceId], ["user-workspaces"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+      onSuccess: () => {
       },
       onError: (error) => {
         toast.error(error.response?.data.message);
@@ -39,3 +44,21 @@ export const useUpdateWorkspace = (workspaceId: number) => {
     }
   );  
 };
+
+
+export const useDeleteWorkspace = (workspaceId: number, navigate: NavigateFunction) => {
+  return useApiMutation<null>(
+    "DELETE",
+    API.ENDPOINTS.WORKSPACE.Id(workspaceId),
+    {
+      invalidateQueries: [["workspace", workspaceId], ["user-workspaces"]],
+      onSuccess: (data) => {
+        toast.success(data.message);
+        navigate(ROUTES.AUTHENTICATED.DASHBOARD)
+      },
+      onError: (error) => {
+        toast.error(error.response?.data.message);
+      },
+    }
+  )
+}

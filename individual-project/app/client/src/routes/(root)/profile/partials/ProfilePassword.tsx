@@ -18,10 +18,20 @@ import {
 import { LoaderCircle } from "lucide-react";
 import { lazy, Suspense } from "react";
 
-const PasswordStrengthChecks = lazy(() => import("@/components/PasswordChecker"))
+import {
+  PartialContainer,
+  Section,
+  SectionLabel,
+  SectionHeading,
+  SectionDescription,
+  SectionContent,
+} from "@/components/ui/partial";
+
+const PasswordStrengthChecks = lazy(
+  () => import("@/components/PasswordChecker")
+);
 
 const ProfilePassword = () => {
-
   const updatePasswordsForm = useForm({
     resolver: zodResolver(updatePasswordSchema),
     defaultValues: {
@@ -36,7 +46,8 @@ const ProfilePassword = () => {
   const { mutateAsync: updatePassword, isPending } =
     useApiMutation<updatePasswordSchemaType>("PUT", "/auth/update-password", {
       onSuccess: (data) => {
-        updatePasswordsForm.reset(), toast.success(data.message);
+        updatePasswordsForm.reset();
+        toast.success(data.message);
       },
       onError: (err) => toast.error(err.response?.data.message),
     });
@@ -45,90 +56,103 @@ const ProfilePassword = () => {
     await updatePassword(data);
 
   return (
-    <div className="space-y-8 mt-5">
-      <div className="grid grid-cols-3 gap-8 items-start">
-        <div>
-          <h3 className="font-medium">Pasword</h3>
-          <p className="text-sm mt-1 text-stone-400">
-            This will be your unique identifier.
-          </p>
-        </div>
-        <Form {...updatePasswordsForm}>
-          <form
-            onSubmit={updatePasswordsForm.handleSubmit(handleUpdatePassword)}
-            className="col-span-2 space-y-4"
-          >
-            <FormField
-              control={updatePasswordsForm.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem className="grid gap-3">
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Current Password"
-                      className="input no-ring"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={updatePasswordsForm.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem className="grid gap-3">
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="New password"
-                      className="input no-ring"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {watch("newPassword") ? (
-              <Suspense fallback={null}>
-                <PasswordStrengthChecks password={watch("newPassword")} />
-              </Suspense>
-            ) : null}
-            <FormField
-              control={updatePasswordsForm.control}
-              name="confirmNewPassword"
-              render={({ field }) => (
-                <FormItem className="grid gap-3">
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Confirm New password"
-                      className="input no-ring"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <PartialContainer className="mt-5 max-w-3xl">
+      <Section>
+        {/* Left Column — Label */}
+        <SectionLabel>
+          <SectionHeading>Password</SectionHeading>
+          <SectionDescription>
+            Update your account password. Strong passwords keep your account secure.
+          </SectionDescription>
+        </SectionLabel>
 
-            <Button type="submit" disabled={isPending}>
-              {isPending ? (
-                <div className="flex items-center gap-3">
-                  <LoaderCircle className="animate-spin" />
-                  <p>Saving...</p>
-                </div>
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </form>
-        </Form>
-      </div>
-    </div>
+        {/* Right Column — Content */}
+        <SectionContent>
+          <Form {...updatePasswordsForm}>
+            <form
+              onSubmit={updatePasswordsForm.handleSubmit(handleUpdatePassword)}
+              className="space-y-4"
+            >
+              {/* Current password */}
+              <FormField
+                control={updatePasswordsForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Current Password"
+                        className="input no-ring"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* New password */}
+              <FormField
+                control={updatePasswordsForm.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="New Password"
+                        className="input no-ring"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Password strength checker */}
+              {watch("newPassword") ? (
+                <Suspense fallback={null}>
+                  <PasswordStrengthChecks password={watch("newPassword")} />
+                </Suspense>
+              ) : null}
+
+              {/* Confirm new password */}
+              <FormField
+                control={updatePasswordsForm.control}
+                name="confirmNewPassword"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm New Password"
+                        className="input no-ring"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Submit */}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <div className="flex items-center gap-3">
+                    <LoaderCircle className="animate-spin" />
+                    <p>Saving...</p>
+                  </div>
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </SectionContent>
+      </Section>
+    </PartialContainer>
   );
 };
 

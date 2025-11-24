@@ -11,7 +11,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useCallback, useMemo, useState } from "react";
 import { ChevronRight, LoaderCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { questionnaireSteps, randomColors } from "@/consts/consts";
+import { questionnaireSteps, randomColors } from "@/components/ui/consts/consts";
 import { WorkspaceVisibility, type Workspace } from "@/types/workspace";
 import type { WorkspaceSchemaType } from "@/utils/schemas/workspace/workspace.schema";
 
@@ -57,8 +57,8 @@ const OnboardingPage = () => {
         onSuccess: (data) => {
           if (data.success && data.data) {
             localStorage.setItem("currentWorkspaceId", data.data.id.toString());
-            navigate(`${ROUTES.AUTHENTICATED.BOARD(data.data.id)}`);
             refetch();
+            navigate(ROUTES.AUTHENTICATED.DASHBOARD);
           }
         },
       }

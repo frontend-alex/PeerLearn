@@ -3,7 +3,7 @@ import { clsx, type ClassValue } from "clsx";
 import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import type z from "zod";
-import { randomColors, randomColorsDark } from "@/consts/consts";
+import { randomColors, randomColorsDark } from "@/components/ui/consts/consts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

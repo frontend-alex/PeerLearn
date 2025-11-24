@@ -1,11 +1,11 @@
 import { lazy, Suspense, useMemo } from "react";
 
 import { useLocation, useParams } from "react-router-dom";
-import { FileText, Folder, LayoutDashboard, Square } from "lucide-react";
+import { FileText, Folder, LayoutDashboard, Settings, Square, User } from "lucide-react";
 
 import { ROUTES } from "@/lib/router-paths";
 import { DocumentKind } from "@/types/workspace";
-import { defaultWorkspaceColor } from "@/consts/consts";
+import { defaultWorkspaceColor } from "@/components/ui/consts/consts";
 import { useUserWorkspaces, useWorkspace } from "@/routes/(root)/workspace/hooks/use-workspaces";
 import { DropdownSkeleton as UserDropdownSkeleton } from "@/components/skeletons/dropdown-skeleton";
 import { ButtonSkeleton as ManageWorkspaceDropdownSkeleton } from "@/components/skeletons/button-skeleton";
@@ -53,6 +53,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: ROUTES.AUTHENTICATED.DASHBOARD,
           icon: LayoutDashboard,
           isActive: pathname === ROUTES.AUTHENTICATED.DASHBOARD,
+        },
+        {
+          title: "Profile",
+          url: ROUTES.AUTHENTICATED.PROFILE,
+          icon: User,
+          isActive: pathname === ROUTES.AUTHENTICATED.PROFILE,
+        },
+        {
+          title: "Settings",
+          url: ROUTES.AUTHENTICATED.SETTINGS,
+          icon: Settings,
+          isActive: pathname === ROUTES.AUTHENTICATED.SETTINGS,
         },
       ],
     }),

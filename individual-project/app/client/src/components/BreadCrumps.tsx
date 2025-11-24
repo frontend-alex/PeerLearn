@@ -11,10 +11,9 @@ import { useUpdateDocument } from "@/routes/(root)/document/hooks/use-document";
 
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { WorkspaceVisibilityIcon } from "./SmallComponents";
 import { BreadCrumpSkeleton } from "./skeletons/breadcrumps-skeleton";
+import { VisibilityToggle } from "./visibility-toggle";
 
-// Map route segments to display names
 const ROUTE_SEGMENT_NAMES: Record<string, string> = {
   edit: "Edit",
   billing: "Billing",
@@ -34,7 +33,10 @@ const ROUTE_SEGMENT_NAMES: Record<string, string> = {
 
 // Helper to get display name for a route segment
 const getSegmentDisplayName = (segment: string): string => {
-  return ROUTE_SEGMENT_NAMES[segment.toLowerCase()] || segment.charAt(0).toUpperCase() + segment.slice(1);
+  return (
+    ROUTE_SEGMENT_NAMES[segment.toLowerCase()] ||
+    segment.charAt(0).toUpperCase() + segment.slice(1)
+  );
 };
 
 const BreadCrumps = () => {
@@ -63,22 +65,23 @@ const BreadCrumps = () => {
 
   // Parse breadcrumb items from pathname
   const breadcrumbItems = useMemo(() => {
-    const items: Array<{ label: string; path: string; isDocument?: boolean }> = [];
+    const items: Array<{ label: string; path: string; isDocument?: boolean }> =
+      [];
     const pathname = location.pathname;
-    
+
     // Parse path segments: /app/v1/workspace/:workspaceId/...
     const segments = pathname.split("/").filter(Boolean);
     const appIndex = segments.indexOf("app");
     const v1Index = segments.indexOf("v1");
-    
+
     if (appIndex !== -1 && v1Index !== -1) {
       const routeSegments = segments.slice(v1Index + 1); // Everything after /app/v1
-      
+
       // Handle top-level routes (profile, settings, dashboard) - these don't need workspace context
       if (routeSegments.length > 0) {
         const firstSegment = routeSegments[0];
         const topLevelRoutes = ["profile", "settings", "dashboard"];
-        
+
         if (topLevelRoutes.includes(firstSegment.toLowerCase())) {
           // For top-level routes, show Dashboard > RouteName (or just RouteName if it's dashboard)
           if (firstSegment.toLowerCase() !== "dashboard") {
@@ -87,14 +90,14 @@ const BreadCrumps = () => {
               path: ROUTES.AUTHENTICATED.DASHBOARD,
             });
           }
-          
+
           // Add the top-level route
           const routePath = `${ROUTES.BASE.APP}/${firstSegment}`;
           items.push({
             label: getSegmentDisplayName(firstSegment),
             path: routePath,
           });
-          
+
           // Handle sub-routes if any (e.g., /settings/theme, /profile/edit)
           if (routeSegments.length > 1) {
             let currentPath = routePath;
@@ -107,52 +110,55 @@ const BreadCrumps = () => {
               });
             }
           }
-          
+
           return items;
         }
       }
-      
+
       // For workspace routes, start with Dashboard
       items.push({
         label: "Dashboard",
         path: ROUTES.AUTHENTICATED.DASHBOARD,
       });
-      
+
       let currentPath: string = ROUTES.BASE.APP;
       let i = 0;
       let hasWorkspace = false;
       let hasDocument = false;
-      
+
       while (i < routeSegments.length) {
         const segment = routeSegments[i];
-        
+
         // Handle workspace
         if (segment === "workspace" && i + 1 < routeSegments.length) {
           const wsId = routeSegments[i + 1];
           currentPath = `${currentPath}/workspace/${wsId}`;
           hasWorkspace = true;
-          
+
           // Add workspace to breadcrumbs (use name if available, otherwise use "Workspace")
           items.push({
             label: workspace?.name || "Workspace",
             path: currentPath,
           });
-          
+
           i += 2; // Skip "workspace" and workspaceId
           continue;
         }
-        
+
         // Handle document/whiteboard
-        if ((segment === "document" || segment === "whiteboard") && i + 1 < routeSegments.length) {
+        if (
+          (segment === "document" || segment === "whiteboard") &&
+          i + 1 < routeSegments.length
+        ) {
           const docId = routeSegments[i + 1];
           currentPath = `${currentPath}/${segment}/${docId}`;
           hasDocument = true;
-          
+
           // Find document in workspace
           const doc = workspaceResponse?.data?.documents?.find(
             (d) => d.id === Number(docId)
           );
-          
+
           if (doc) {
             items.push({
               label: doc.title || getSegmentDisplayName(segment),
@@ -166,11 +172,11 @@ const BreadCrumps = () => {
               isDocument: true,
             });
           }
-          
-          i += 2; 
+
+          i += 2;
           continue;
         }
-        
+
         // Handle other segments (edit, billing, etc.) - these come after workspace or document
         if (hasWorkspace || hasDocument) {
           currentPath = `${currentPath}/${segment}`;
@@ -179,11 +185,11 @@ const BreadCrumps = () => {
             path: currentPath,
           });
         }
-        
+
         i++;
       }
     }
-    
+
     // If no items were added (fallback), default to Dashboard
     if (items.length === 0) {
       items.push({
@@ -191,7 +197,7 @@ const BreadCrumps = () => {
         path: ROUTES.AUTHENTICATED.DASHBOARD,
       });
     }
-    
+
     return items;
   }, [location.pathname, workspace, workspaceResponse?.data?.documents]);
 
@@ -226,11 +232,6 @@ const BreadCrumps = () => {
     }
   };
 
-  const handleVisibilityToggle = async (newVisibility: WorkspaceVisibility) => {
-    const backendVisibility = newVisibility === WorkspaceVisibility.PRIVATE ? "Private" : "Public";
-    await updateDocument({ visibility: backendVisibility as any });
-  };
-
   if (isLoading) return <BreadCrumpSkeleton />;
 
   return (
@@ -256,15 +257,22 @@ const BreadCrumps = () => {
       </div>
 
       {/* Breadcrumb */}
-      <nav className="hidden md:flex items-center gap-0 text-sm" aria-label="Breadcrumb">
+      <nav
+        className="hidden md:flex items-center gap-0 text-sm"
+        aria-label="Breadcrumb"
+      >
         {breadcrumbItems.map((item, index) => {
           const isLast = index === breadcrumbItems.length - 1;
-          const isDocumentItem = item.isDocument && documentId && currentDocument;
-          
+          const isDocumentItem =
+            item.isDocument && documentId && currentDocument;
+
           return (
-            <div key={`${item.path}-${index}`} className="flex items-center gap-0">
+            <div
+              key={`${item.path}-${index}`}
+              className="flex items-center gap-0"
+            >
               {index > 0 && <span className="text-muted-foreground">/</span>}
-              
+
               {isDocumentItem ? (
                 <>
                   {isEditing ? (
@@ -286,10 +294,17 @@ const BreadCrumps = () => {
                       {item.label}
                     </Button>
                   )}
-                  <WorkspaceVisibilityIcon
+                  <VisibilityToggle
                     className="size-5 ml-1"
                     visibility={currentDocument?.visibility}
-                    onToggle={handleVisibilityToggle}
+                    onChange={(newVis) =>
+                      updateDocument({
+                        visibility:
+                          newVis === WorkspaceVisibility.PRIVATE
+                            ? WorkspaceVisibility.PRIVATE
+                            : WorkspaceVisibility.PUBLIC,
+                      })
+                    }
                     clickable={true}
                   />
                 </>

@@ -44,15 +44,15 @@ export const questionnaireSteps = [
 ];
 
 export const randomColors = [
-  "#ef444433",
-  "#3b82f633",
-  "#22c55e33",
-  "#eab30833",
-  "#a855f733",
-  "#ec489933",
-  "#6366f133",
-  "#14b8a633",
-  "#f9731633",
+  "#ef4444",
+  "#3b82f6",
+  "#22c55e",
+  "#eab308",
+  "#a855f7",
+  "#ec4899",
+  "#6366f1",
+  "#14b8a6",
+  "#f97316",
 ];
 
 export const randomColorsDark = [

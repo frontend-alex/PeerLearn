@@ -4,13 +4,13 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { defaultDocumentColor } from "@/consts/consts";
+import { defaultDocumentColor } from "@/components/ui/consts/consts";
 import { ROUTES } from "@/lib/router-paths";
 import CreateDocumentCard from "@/routes/(root)/workspace/components/add-document-card";
 import type { Document } from "@/types/workspace";
 import { formatDistanceToNow } from "date-fns";
 import { Clock } from "lucide-react";
-import { WorkspaceVisibilityIcon } from "../SmallComponents";
+import { VisibilityToggle } from "../visibility-toggle";
 
 const CreateDocCarousel = ({ documents }: { documents: Document[] }) => {
   return (
@@ -32,7 +32,7 @@ const CreateDocCarousel = ({ documents }: { documents: Document[] }) => {
                 document.kind
               )}
               headerIcon={
-                <WorkspaceVisibilityIcon
+                <VisibilityToggle
                   className="size-5"
                   visibility={document.visibility}
                 />

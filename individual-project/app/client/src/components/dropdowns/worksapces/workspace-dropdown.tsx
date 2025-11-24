@@ -6,11 +6,10 @@ import { Check, ChevronsUpDown, House, Loader, Plus } from "lucide-react";
 import { API } from "@/lib/config";
 import { ROUTES } from "@/lib/router-paths";
 import { useApiMutation } from "@/hooks/hook";
-import { defaultWorkspaceColor } from "@/consts/consts";
+import { defaultWorkspaceColor } from "@/components/ui/consts/consts";
 import { Button } from "@/components/ui/button";
 import GlobalDialog from "@/components/dialogs/GlobalDialog";
 import { useUserWorkspaces } from "@/routes/(root)/workspace/hooks/use-workspaces";
-import { WorkspaceVisibilityIcon } from "@/components/SmallComponents";
 import { type Workspace, WorkspaceVisibility } from "@/types/workspace";
 import { useCurrentWorkspace } from "@/routes/(root)/workspace/hooks/use-current-workspace";
 import WorkspaceForm from "@/components/auth/forms/workspace/workspace-form-01";
@@ -23,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownSkeleton } from "@/components/skeletons/dropdown-skeleton";
+import { VisibilityToggle } from "@/components/visibility-toggle";
 
 const WorkspaceDropdown = () => {
 
@@ -85,7 +85,7 @@ const WorkspaceDropdown = () => {
                 : "Select Workspace"}
             </span>
             {hasWorkspaceContext && (
-              <WorkspaceVisibilityIcon
+              <VisibilityToggle
                 visibility={currentWorkspace?.visibility}
               />
             )}
@@ -119,7 +119,7 @@ const WorkspaceDropdown = () => {
                           {workspace.name}
                         </span>
                       </div>
-                      <WorkspaceVisibilityIcon
+                      <VisibilityToggle
                         visibility={workspace.visibility}
                       />
                     </div>

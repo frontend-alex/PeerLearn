@@ -9,7 +9,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useReactFlow, type Node, useStore } from "@xyflow/react";
-import { randomColorsDark } from "@/consts/consts";
+import { randomColorsDark } from "@/components/ui/consts/consts";
 import type {
   RectangleNodeData,
   CircleNodeData,

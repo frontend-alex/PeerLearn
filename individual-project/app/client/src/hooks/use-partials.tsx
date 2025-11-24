@@ -1,58 +1,66 @@
 import { type User } from "@/types/user";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type React from "react";
 
 type PartialModuleProps = {
   user: User;
   refetchUser: () => void;
-} & Record<string, unknown>; 
+} & Record<string, unknown>;
 
-export type ModuleLoader<T extends PartialModuleProps = PartialModuleProps> = Record<
-  string,
-  () => Promise<{ default: React.FC<T> }>
->;
+export type ModuleLoader<T extends PartialModuleProps = PartialModuleProps> =
+  Record<string, () => Promise<{ default: React.FC<T> }>>;
 
 type FilterFn = (filename: string, user: User) => boolean;
-
 
 type UseDynamicPartialsOptions<T extends Record<string, unknown> = {}> = {
   partialModules: ModuleLoader<PartialModuleProps & T>;
   user: User | null | undefined;
-  refetchUser: () => void;
+
+  // kept for API compatibility but NOT used inside the hook
+  refetchUser?: () => void;
   extraProps?: T;
   border?: boolean;
+
   filterFn?: FilterFn;
   reverseOrder?: boolean;
 };
 
+export type DynamicPartial<TExtra extends Record<string, unknown> = {}> = {
+  key: string;
+  Component: React.FC<PartialModuleProps & TExtra>;
+};
+
 /**
  * useDynamicPartials
- * 
- * @template T - Additional props that each partial component should receive.
- * @param partialModules - Record of module paths to dynamic import functions.
- * @param user - Authenticated user object.
- * @param refetchUser - Function to refetch user data.
- * @param extraProps - Additional props to pass into each partial component.
- * @param border - Whether to apply border styles.
- * @param filterFn - Optional function to filter which partials to load.
- * 
- * @returns JSX.Elements array for rendering
+ *
+ * Loads dynamic partial modules once (per user / filter / order),
+ * and returns their component definitions. The caller is responsible
+ * for rendering them with props (user, refetchUser, extraProps).
  */
 export function useDynamicPartials<T extends Record<string, unknown> = {}>({
   partialModules,
   user,
-  refetchUser,
-  extraProps,
-  border = true,
   filterFn,
   reverseOrder = false,
-}: UseDynamicPartialsOptions<T>) {
-  const [partials, setPartials] = useState<React.ReactNode[]>([]);
+}: UseDynamicPartialsOptions<T>): DynamicPartial<T>[] {
+  const [partials, setPartials] = useState<DynamicPartial<T>[]>([]);
+
+  // stable list of module entries
+  const moduleEntries = useMemo(
+    () => Object.entries(partialModules),
+    [partialModules]
+  );
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setPartials([]);
+      return;
+    }
 
-    const loadPartials = async () => {
-      let entries = Object.entries(partialModules);
+    let cancelled = false;
+
+    const load = async () => {
+      let entries = [...moduleEntries];
       entries.sort(([a], [b]) => a.localeCompare(b));
       if (reverseOrder) entries.reverse();
 
@@ -62,6 +70,7 @@ export function useDynamicPartials<T extends Record<string, unknown> = {}>({
 
         if (filterFn) return filterFn(fileName, user);
 
+        // default filtering logic – keep it if you still need it
         const hasPassword = true;
         if (fileName === "changecredentialstwo" && hasPassword) return false;
         if (fileName === "changecredentials" && !hasPassword) return false;
@@ -71,20 +80,26 @@ export function useDynamicPartials<T extends Record<string, unknown> = {}>({
       const loaded = await Promise.all(
         filtered.map(async ([path, loader]) => {
           const mod = await loader();
-          const Component = mod.default;
-          return (
-            <div key={path}>
-              <Component user={user} refetchUser={refetchUser} {...(extraProps as T)} />
-            </div>
-          );
+          const Component = mod.default as React.FC<
+            PartialModuleProps & T
+          >;
+
+          return {
+            key: path,
+            Component,
+          };
         })
       );
 
-      setPartials(loaded);
+      if (!cancelled) setPartials(loaded);
     };
 
-    loadPartials();
-  }, [partialModules, refetchUser, extraProps, border, filterFn, reverseOrder]);
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, moduleEntries, filterFn, reverseOrder]);
 
   return partials;
 }
