@@ -110,13 +110,14 @@ const ProfileData = () => {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h2 className="text-xl font-medium mb-2">Account Information</h2>
+        <h2 className="text-xl font-medium">Account Information</h2>
         <p className="text-sm text-stone-400">
           Update your username and email address here.
         </p>
       </div>
-
+      
       <Separator className="bg-accent"/>
+
 
       {renderFormSection({
         title: "Username",

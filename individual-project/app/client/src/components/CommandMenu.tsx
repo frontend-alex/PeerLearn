@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -73,7 +71,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           >
             <LayoutDashboard className="h-4 w-4" />
             <span>Dashboard</span>
-            <CommandShortcut>⌘D</CommandShortcut>
           </CommandItem>
           <CommandItem 
             data-active={location.pathname === ROUTES.AUTHENTICATED.PROFILE}
@@ -81,7 +78,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           >
             <User className="h-4 w-4" />
             <span>Profile</span>
-            <CommandShortcut>⌘P</CommandShortcut>
           </CommandItem>
           <CommandItem 
             data-active={location.pathname === ROUTES.AUTHENTICATED.SETTINGS}
@@ -89,7 +85,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
-            <CommandShortcut>⌘S</CommandShortcut>
           </CommandItem>
         </CommandGroup>
 

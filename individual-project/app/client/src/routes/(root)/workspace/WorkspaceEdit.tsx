@@ -1,7 +1,24 @@
-const WorkspaceEdit = () => {
-  return (
-    <div>WorkspaceEdit</div>
-  )
-}
+import Loading from "@/components/Loading";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDynamicPartials, type ModuleLoader } from "@/hooks/use-partials";
 
-export default WorkspaceEdit
+const partialModules = import.meta.glob("./partials/*.tsx") as ModuleLoader;
+
+const WorkspaceEdit = () => {
+  const { user, isLoading, refetch } = useAuth();
+
+  const partials = useDynamicPartials({
+    partialModules,
+    user,
+    refetchUser: refetch,
+    reverseOrder: false,
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  return <div className="flex flex-col gap-3 max-w-3xl">{partials}</div>;
+};
+
+export default WorkspaceEdit;

@@ -45,7 +45,7 @@ const ProfilePassword = () => {
     await updatePassword(data);
 
   return (
-    <div className="space-y-8 max-w-3xl mt-5">
+    <div className="space-y-8 mt-5">
       <div className="grid grid-cols-3 gap-8 items-start">
         <div>
           <h3 className="font-medium">Pasword</h3>
