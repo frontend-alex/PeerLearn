@@ -48,10 +48,6 @@ const ManageDocumentDropdown = ({
 
   const { documentId } = useParams<{ documentId: string }>();
   const { currentWorkspaceId } = useCurrentWorkspace();
-
-  const pathname = useLocation().pathname;
-  const isWhiteboard = pathname.includes(DocumentKind.WHITEBOARD);
-
   const {
     fileInputRef,
     triggerImport,
@@ -97,7 +93,13 @@ const ManageDocumentDropdown = ({
 
         <DropdownMenuSeparator />
 
-        <Link to={`${ROUTES.AUTHENTICATED.DOCUMENT(currentWorkspaceId, documentId, isWhiteboard ? DocumentKind.WHITEBOARD : DocumentKind.DOCUMENT)}/edit`}>
+        <Link
+          to={`${ROUTES.AUTHENTICATED.DOCUMENT(
+            currentWorkspaceId,
+            documentId ?? "",
+            DocumentKind.DOCUMENT
+          )}/edit`}
+        >
           <DropdownMenuItem>
             <Settings />
             <span>Settings</span>
