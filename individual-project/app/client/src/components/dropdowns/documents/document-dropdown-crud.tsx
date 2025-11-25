@@ -58,9 +58,7 @@ const ManageDocumentDropdown = ({
     canImport,
     canExportWhiteboard,
     canExportDocument,
-  } = useDocumentImportExport({
-    documentId: Number(documentId),
-  });
+  } = useDocumentImportExport({ documentId: documentId ?? "" });
 
   const { mutateAsync: deleteWorkspace, isPending: isDeletingWorkspace } =
     useApiMutation<Workspace>(

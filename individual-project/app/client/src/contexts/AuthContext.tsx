@@ -6,7 +6,8 @@ import { API } from "@/lib/config";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useApiMutation, useApiQuery } from "@/hooks/hook";
-import { createContext, useContext, useMemo, useEffect, useRef } from "react";
+import { createContext, useCallback, useContext, useMemo, useEffect, useRef } from "react";
+import { buildUserUpdateFormData, type UpdateUserPayload } from "@/utils/user/update-form-data";
 import { startSignalRConnection, stopSignalRConnection } from "@/lib/signalr";
 
 type AuthContextType = {
@@ -14,9 +15,10 @@ type AuthContextType = {
   isLoading: boolean;
   error: ApiError | null;
   isAuthenticated: boolean;
+  isUserUpdating: boolean;
   logout: () => void;
   refetch: () => void;
-  update: (data: Partial<User>) => Promise<void>;
+  update: (data: UpdateUserPayload) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,36 +84,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
 
-  const { mutateAsync: updateMutation } = useApiMutation(
-    "PUT",
-    API.ENDPOINTS.USER.UPDATE,
-    {
-      invalidateQueries: [["auth", "me"]],
-      onSuccess: (data) => {
-        toast.success(data.message)
-      },
-    }
-  );
+  const { mutateAsync: updateMutation, isPending: isUserUpdating } = useApiMutation<
+    void,
+    FormData
+  >("PUT", API.ENDPOINTS.USER.UPDATE, {
+    invalidateQueries: [["auth", "me"]],
+    onSuccess: (data) => {
+      toast.success(data.message)
+    },
+  });
 
   const logout = async () => {
     await logoutMutation(undefined);
   };
 
-  const update = async (payload: Partial<User>) => {
-    await updateMutation(payload);
-  };
+  const update = useCallback(
+    async (payload: UpdateUserPayload) => {
+      const formData = buildUserUpdateFormData(payload);
+      const hasEntries = [...formData.keys()].length > 0;
+
+      if (!hasEntries) return;
+
+      await updateMutation(formData);
+    },
+    [updateMutation]
+  );
+
 
   const contextValue = useMemo<AuthContextType>(() => {
     return {
       user: data?.data ?? null,
       isLoading,
       error,
+      isUserUpdating,
       isAuthenticated: Boolean(data?.data) && !error,
       logout,
       refetch,
       update,
     };
-  }, [data, isLoading, error, refetch, logout]);
+  }, [data, isLoading, error, refetch, logout, update, isUserUpdating]);
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

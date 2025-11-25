@@ -10,7 +10,7 @@ import {
 import { importFileToEditorJS } from "@/utils/import";
 
 interface UseDocumentImportExportOptions {
-  documentId: number;
+  documentId: string;
   onImportSuccess?: () => void;
   onExportSuccess?: () => void;
 }

@@ -5,9 +5,6 @@ import { redirect } from "react-router-dom";
 
 const api: AxiosInstance = axios.create({
   baseURL: API.BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
   withCredentials: true,
 });
 
