@@ -1,17 +1,35 @@
 import { toast } from "sonner";
-import { useNavigate, useParams } from "react-router-dom";
-import { Download, EllipsisVerticalIcon, FileText, FileType, Settings, Trash, Upload } from "lucide-react";
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+import {
+  Download,
+  EllipsisVerticalIcon,
+  FileText,
+  FileType,
+  Settings,
+  Trash,
+  Upload,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { API } from "@/lib/config";
 import { ROUTES } from "@/lib/router-paths";
 import { useApiMutation } from "@/hooks/hook";
 import { Button } from "@/components/ui/button";
-import type { Workspace } from "@/types/workspace";
+import { DocumentKind, type Workspace } from "@/types/workspace";
 import DeleteDialog from "@/components/dialogs/DeleteDialog";
 import { useDocumentImportExport } from "@/utils/import-export";
 import { useCurrentWorkspace } from "@/routes/(root)/workspace/hooks/use-current-workspace";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ManageDocumentDropdown = ({
   className,
@@ -30,6 +48,9 @@ const ManageDocumentDropdown = ({
 
   const { documentId } = useParams<{ documentId: string }>();
   const { currentWorkspaceId } = useCurrentWorkspace();
+
+  const pathname = useLocation().pathname;
+  const isWhiteboard = pathname.includes(DocumentKind.WHITEBOARD);
 
   const {
     fileInputRef,
@@ -76,10 +97,12 @@ const ManageDocumentDropdown = ({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
-          <Settings />
-          <span>Settings</span>
-        </DropdownMenuItem>
+        <Link to={`${ROUTES.AUTHENTICATED.DOCUMENT(currentWorkspaceId, documentId, isWhiteboard ? DocumentKind.WHITEBOARD : DocumentKind.DOCUMENT)}/edit`}>
+          <DropdownMenuItem>
+            <Settings />
+            <span>Settings</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         {canImport && (
           <>

@@ -295,7 +295,7 @@ const BreadCrumps = () => {
                     </Button>
                   )}
                   <VisibilityToggle
-                    className="size-5 ml-1"
+                    className="size-5 ml-1 mr-2"
                     visibility={currentDocument?.visibility}
                     onChange={(newVis) =>
                       updateDocument({

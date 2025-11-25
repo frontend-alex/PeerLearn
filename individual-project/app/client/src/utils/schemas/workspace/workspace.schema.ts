@@ -8,7 +8,7 @@ export const workspaceSchema = z.object({
 
 export type WorkspaceSchemaType = z.infer<typeof workspaceSchema>;
 
-const hexColorRegex = /^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+export const hexColorRegex = /^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
 export const updateWorkspaceSchema = z
   .object({

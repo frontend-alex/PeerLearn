@@ -61,7 +61,7 @@ export enum WorkspaceInvitationStatus {
 export interface Document {
   id: number;
   workspaceId: number;
-  title?: string;
+  title: string;
   kind: DocumentKind;
   yDocId: string;
   content?: string;

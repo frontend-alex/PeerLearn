@@ -74,6 +74,7 @@ export const EditorJSEditor = ({
           // @ts-ignore - no types available
           import("@editorjs/marker"),
           import("@editorjs/underline"),
+          
         ]);
 
         const editor = new EditorJS({

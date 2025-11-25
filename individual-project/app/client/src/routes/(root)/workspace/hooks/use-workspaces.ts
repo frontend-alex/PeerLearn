@@ -7,7 +7,6 @@ import type { UpdateWorkspaceSchemaType } from "@/utils/schemas/workspace/worksp
 import type { NavigateFunction } from "react-router-dom";
 import { ROUTES } from "@/lib/router-paths";
 
-export type UpdateWorkspaceFn = (data: UpdateWorkspaceSchemaType) => Promise<ApiSuccessResponse<Workspace>>;
 
 export const useUserWorkspaces = () => {
   return useApiQuery<Workspace[]>(
@@ -30,6 +29,8 @@ export const useWorkspace = (workspaceId: number | undefined) => {
   );
 };
 
+export type UpdateWorkspaceFn = (data: UpdateWorkspaceSchemaType) => Promise<ApiSuccessResponse<Workspace>>;
+
 export const useUpdateWorkspace = (workspaceId: number) => {
   return useApiMutation<Workspace>(
     "PUT",
@@ -45,6 +46,7 @@ export const useUpdateWorkspace = (workspaceId: number) => {
   );  
 };
 
+export type DeleteWorksapceFn = (args: null) => Promise<ApiSuccessResponse<unknown>>
 
 export const useDeleteWorkspace = (workspaceId: number, navigate: NavigateFunction) => {
   return useApiMutation<null>(

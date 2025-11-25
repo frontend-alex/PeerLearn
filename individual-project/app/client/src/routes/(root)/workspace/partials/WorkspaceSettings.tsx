@@ -1,18 +1,14 @@
 import DeleteCard from "@/components/cards/delete-card";
-import { useDeleteWorkspace } from "../hooks/use-workspaces";
-import { useNavigate } from "react-router-dom";
+import type { DeleteDocumentFn } from "../../document/hooks/use-document";
 
 const ProfileSettings = ({
-  currentWorkspaceId,
+  deleteWorkspace,
 }: {
-  currentWorkspaceId: number;
+  deleteWorkspace: DeleteDocumentFn;
 }) => {
-  const navigate = useNavigate();
-  const { mutateAsync: del } = useDeleteWorkspace(currentWorkspaceId, navigate);
-
   return (
     <DeleteCard
-      fn={async () => await del(null)}
+      fn={async () => await deleteWorkspace(null)}
       button="Delete Workspace"
       description="Deleting your workspace is permanent and will remove all your data."
       dialogDescription="You're about to permanently delete your workspace. This action cannot be undone."

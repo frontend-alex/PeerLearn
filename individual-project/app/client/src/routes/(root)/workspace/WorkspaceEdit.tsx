@@ -12,12 +12,16 @@ import {
   type ModuleLoader,
 } from "@/hooks/use-partials";
 import type { UpdateWorkspaceSchemaType } from "@/utils/schemas/workspace/workspace.schema";
+import { useNavigate } from "react-router-dom";
 
 const partialModules = import.meta.glob(
   "./partials/*.tsx"
 ) as ModuleLoader;
 
 const WorkspaceEdit = () => {
+
+  const navigate = useNavigate();
+
   const { user, isLoading, refetch } = useAuth();
   const { currentWorkspaceId } = useCurrentWorkspace();
 
@@ -28,7 +32,7 @@ const WorkspaceEdit = () => {
     useUpdateWorkspace(currentWorkspaceId);
 
   const { mutateAsync: del, isPending: isWorkspaceDeleting } =
-    useDeleteWorkspace(currentWorkspaceId);
+    useDeleteWorkspace(currentWorkspaceId, navigate);
 
   const updateWorkspace = async (data: UpdateWorkspaceSchemaType) =>
     await update(data);
@@ -67,7 +71,7 @@ const WorkspaceEdit = () => {
   console.log('first')
 
   return (
-    <div className="flex flex-col gap-3 max-w-3xl">
+    <div className="flex flex-col gap-10 max-w-3xl">
       {partials.map(({ key, Component }) => (
         <div key={key}>
           <Component

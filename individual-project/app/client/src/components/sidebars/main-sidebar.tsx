@@ -30,8 +30,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const pathname = location.pathname;
 
-  // Check if we're on a workspace-specific route (workspace page, document, or whiteboard)
-  // All these routes start with /app/v1/workspace/:workspaceId
   const isWorkspaceRoute = pathname.startsWith(`${ROUTES.BASE.APP}/workspace`);
   const showAllWorkspaces = !isWorkspaceRoute;
 

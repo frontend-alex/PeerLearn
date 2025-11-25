@@ -3,7 +3,7 @@ import type { Document } from "@/types/workspace";
 import { formatDistanceToNow } from "date-fns";
 import { Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { WorkspaceVisibilityIcon } from "../SmallComponents";
+import { VisibilityToggle } from "../visibility-toggle";
 
 const DocumentCardRow = ({ document }: { document: Document }) => {
   return (
@@ -29,7 +29,7 @@ const DocumentCardRow = ({ document }: { document: Document }) => {
             { addSuffix: true }
           )}
         </span>
-        <WorkspaceVisibilityIcon  className="size-5" visibility={document.visibility}/>
+        <VisibilityToggle  className="size-5" visibility={document.visibility}/>
       </div>
     </Link>
   );
