@@ -1,3 +1,4 @@
+using System.Linq;
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence.SQL;
@@ -28,6 +29,24 @@ public class UserRepository : IUserRepository {
 
     public async Task<IEnumerable<User>> GetAllAsync() {
         return await _context.Users.ToListAsync();
+    }
+
+    public async Task<IEnumerable<User>> SearchAsync(string query, int limit) {
+        string normalizedQuery = query.Trim().ToLower();
+
+        if (string.IsNullOrWhiteSpace(normalizedQuery)) {
+            return Enumerable.Empty<User>();
+        }
+
+        return await _context.Users
+            .Where(user =>
+                user.Username.ToLower().Contains(normalizedQuery) ||
+                user.Email.ToLower().Contains(normalizedQuery) ||
+                user.FirstName.ToLower().Contains(normalizedQuery) ||
+                user.LastName.ToLower().Contains(normalizedQuery))
+            .OrderBy(user => user.Username)
+            .Take(limit)
+            .ToListAsync();
     }
 
     public async Task<User> CreateAsync(User user) {

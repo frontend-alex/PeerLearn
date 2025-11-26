@@ -1,5 +1,7 @@
 namespace API.Controllers.User;
 
+using System.Collections.Generic;
+using System.Linq;
 using API.Models;
 using Core.DTOs;
 using API.Mappers;
@@ -14,6 +16,19 @@ public class UserController : BaseController {
 
     public UserController(UserService userService) {
         _userService = userService;
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] int limit = 8) {
+        IEnumerable<UserDto> users = await _userService.SearchUsers(query, limit);
+
+        IEnumerable<UserResponse> response = users.Select(UserMapper.ToGetUserResponse);
+
+        return Ok(new ApiResponse<IEnumerable<UserResponse>> {
+            Success = true,
+            Message = "Users retrieved successfully.",
+            Data = response
+        });
     }
 
     [HttpGet("me")]

@@ -46,6 +46,8 @@ export const API = {
     USER: {
       ME: "/User/me",
       UPDATE: "/User/update",
+      SEARCH: (query: string, limit = 8) =>
+        `/User/search?query=${encodeURIComponent(query)}&limit=${limit}`,
     },
     WORKSPACE: {
       Id: (id: number | undefined) => `/Workspace/${id}`,

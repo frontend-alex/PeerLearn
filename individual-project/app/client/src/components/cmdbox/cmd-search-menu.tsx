@@ -8,7 +8,6 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
 import {
   LayoutDashboard,
@@ -27,7 +26,7 @@ interface CommandMenuProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
+const CmdMenuBox = ({ open, onOpenChange }: CommandMenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: workspacesResponse } = useUserWorkspaces();
@@ -65,13 +64,15 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
         {/* General Navigation */}
         <CommandGroup heading="General">
+          <div className="flex flex-col gap-1">
+
           <CommandItem 
             data-active={location.pathname === ROUTES.AUTHENTICATED.DASHBOARD}
             onSelect={() => runCommand(ROUTES.AUTHENTICATED.DASHBOARD)}
           >
             <LayoutDashboard className="h-4 w-4" />
             <span>Dashboard</span>
-          </CommandItem>
+          </CommandItem>  
           <CommandItem 
             data-active={location.pathname === ROUTES.AUTHENTICATED.PROFILE}
             onSelect={() => runCommand(ROUTES.AUTHENTICATED.PROFILE)}
@@ -86,6 +87,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </CommandItem>
+          </div>
         </CommandGroup>
 
         {/* Workspaces */}
@@ -93,7 +95,8 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           <>
             <CommandSeparator />
             <CommandGroup heading="Workspaces">
-              {workspaces.map((workspace) => {
+             <div className="flex flex-col gap-1">
+               {workspaces.map((workspace) => {
                 const workspaceUrl = ROUTES.AUTHENTICATED.WORKSPACE(workspace.id);
                 const isActive = location.pathname === workspaceUrl;
                 return (
@@ -107,6 +110,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                   </CommandItem>
                 );
               })}
+             </div>
             </CommandGroup>
           </>
         )}
@@ -116,7 +120,8 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           <>
             <CommandSeparator />
             <CommandGroup heading="Documents">
-              {allDocuments.map((doc) => {
+              <div className="flex flex-col gap-1">
+                {allDocuments.map((doc) => {
                 const isActive = location.pathname === doc.url;
                 return (
                   <CommandItem 
@@ -136,6 +141,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                   </CommandItem>
                 );
               })}
+              </div>
             </CommandGroup>
           </>
         )}
@@ -144,3 +150,4 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   );
 }
 
+export default CmdMenuBox

@@ -1,5 +1,7 @@
 namespace Core.Services.User;
 
+using System;
+using System.Linq;
 using Core.Models;
 using Core.Exceptions;
 using Infrastructure.Repositories;
@@ -18,6 +20,18 @@ public class UserService {
             ?? throw AppException.CreateError("USER_NOT_FOUND");
 
         return UserMapper.ToUserDto(user);
+    }
+
+    public async Task<IEnumerable<UserDto>> SearchUsers(string query, int limit) {
+        if (string.IsNullOrWhiteSpace(query)) {
+            return Enumerable.Empty<UserDto>();
+        }
+
+        int cappedLimit = Math.Clamp(limit, 1, 25);
+
+        IEnumerable<User> users = await _userRepository.SearchAsync(query, cappedLimit);
+
+        return users.Select(UserMapper.ToUserDto);
     }
 
     public async Task UpdateUser(int id, Dictionary<string, object> updates) {

@@ -1,11 +1,16 @@
-import { lazy, Suspense, useState, useEffect } from "react";
-import { ROUTES } from "@/lib/router-paths";
+import { lazy, Suspense, useMemo } from "react";
+
 import { useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { BreadCrumpSkeleton } from "../skeletons/breadcrumps-skeleton";
 import { Bell, Pin, Search, UserRoundPlus } from "lucide-react";
-import { ButtonSkeleton as ManageWorkspaceDropdownSkeleton } from "../skeletons/button-skeleton";
-import { CommandMenu } from "../CommandMenu";
+
+import { ROUTES } from "@/lib/router-paths";
+import { Button } from "@/components/ui/button";
+import CmdMenuBox from "@/components/cmdbox/cmd-search-menu";
+import { ButtonSkeleton as ManageWorkspaceDropdownSkeleton } from "@/components/skeletons/button-skeleton";
+import { useBoardUI } from "@/contexts/UIContext";
+
+import { BreadCrumpSkeleton } from "../skeletons/breadcrumps-skeleton";
+import CmdInviteMenu from "@/components/cmdbox/cmd-invite-menu";
 
 const LazyBreadCrumps = lazy(() => import("@/components/BreadCrumps"));
 
@@ -19,28 +24,16 @@ const LazyManageDocumentDropdown = lazy(
 
 const BoardLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-  const isBoardRoute = location.pathname.startsWith(
-    `${ROUTES.BASE.APP}/workspace`
-  );
+  const { commandPalette, notificationPopover, inviteCommand } = useBoardUI();
 
-  const isDocumentRoute =
-    location.pathname.includes("/document/") ||
-    location.pathname.includes("/whiteboard/");
-
-  // Keyboard shortcut: Cmd+K or Ctrl+K to open command menu
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCommandMenuOpen((open) => !open);
-      }
+  const { isBoardRoute, isDocumentRoute } = useMemo(() => {
+    const path = location.pathname;
+    return {
+      isBoardRoute: path.startsWith(`${ROUTES.BASE.APP}/workspace`),
+      isDocumentRoute:
+        path.includes("/document/") || path.includes("/whiteboard/"),
     };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -51,7 +44,12 @@ const BoardLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex flex-row items-center gap-3">
           {isBoardRoute && (
             <>
-              <Button size="icon" variant={"secondary"}>
+              <Button
+                size="icon"
+                variant={"secondary"}
+                onClick={inviteCommand.toggle}
+                aria-pressed={inviteCommand.isOpen}
+              >
                 <UserRoundPlus className="size-4" />
               </Button>
               <Button size="icon" variant={"secondary"}>
@@ -68,21 +66,33 @@ const BoardLayout = ({ children }: { children: React.ReactNode }) => {
             </>
           )}
           <div className="relative">
-            <Button size="icon" variant={"secondary"}>
+            <Button
+              size="icon"
+              variant={"secondary"}
+              onClick={notificationPopover.toggle}
+              aria-pressed={notificationPopover.isOpen}
+            >
               <Bell className="size-4" />
             </Button>
             <span className="absolute -top-1 animate-pulse -right-1 bg-red-500 text-white text-xs rounded-full size-3 " />
           </div>
-          <Button 
-            size="icon" 
+          <Button
+            size="icon"
             variant={"secondary"}
-            onClick={() => setCommandMenuOpen(true)}
+            onClick={commandPalette.open}
           >
             <Search className="size-4" />
           </Button>
         </div>
       </div>
-      <CommandMenu open={commandMenuOpen} onOpenChange={setCommandMenuOpen} />
+      <CmdMenuBox
+        open={commandPalette.isOpen}
+        onOpenChange={commandPalette.set}
+      />
+      <CmdInviteMenu
+        open={inviteCommand.isOpen}
+        onOpenChange={inviteCommand.set}
+      />
       <div className={`flex-1 items-center min-h-0`}>{children}</div>
     </div>
   );
