@@ -22,7 +22,7 @@ artifacts/
 .DS_Store
 
 # Logs
-*.log
+# *.log
 
 # Temp
 *.tmp

@@ -15,9 +15,13 @@ using Core.Interfaces.Services;
 using Core.Interfaces.repository.workspace;
 using Core.Interfaces.repository.Document;
 
-Env.Load(".env");
-
 var builder = WebApplication.CreateBuilder(args);
+
+// Only load .env file if not in Testing environment
+if (builder.Environment.EnvironmentName != "Testing")
+{
+    Env.Load(".env");
+}
 
 // Controllers & JSON
 builder.Services.AddControllers()
@@ -66,7 +70,8 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment()) {
+// Only use HTTPS redirection in production (not Development or Testing)
+if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")) {
     app.UseHttpsRedirection();
 }
 
@@ -91,10 +96,17 @@ app.MapHub<API.Hubs.AppHub>("/hubs/app");
 // Endpoints
 app.MapControllers();
 
-// Apply migrations
-using (var scope = app.Services.CreateScope()) {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
+// Apply migrations (skip for in-memory database or testing environment)
+if (!app.Environment.IsEnvironment("Testing")) {
+    using (var scope = app.Services.CreateScope()) {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        // Only run migrations if not using in-memory database
+        if (context.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory") {
+            context.Database.Migrate();
+        }
+    }
 }
 
 app.Run();
+
+public partial class Program { }
