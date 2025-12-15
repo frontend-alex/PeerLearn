@@ -30,6 +30,7 @@ artifacts/
 
 # Test results
 TestResult*/
+TestResults/
 *.trx
 *.coverage
 *.coveragexml

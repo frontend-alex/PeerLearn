@@ -20,7 +20,8 @@ public class UserController : BaseController {
 
     [HttpGet("search")]
     public async Task<IActionResult> SearchUsers([FromQuery] string? query, [FromQuery] int limit = 8) {
-        IEnumerable<UserDto> users = await _userService.SearchUsers(query, limit);
+        // Allow empty/missing query without triggering [ApiController] model validation.
+        IEnumerable<UserDto> users = await _userService.SearchUsers(query ?? string.Empty, limit);
 
         IEnumerable<UserResponse> response = users.Select(UserMapper.ToGetUserResponse);
 
