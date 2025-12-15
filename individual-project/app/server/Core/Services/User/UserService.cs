@@ -7,8 +7,9 @@ using Core.Exceptions;
 using Infrastructure.Repositories;
 using Core.DTOs;
 using Core.Mappers;
+using Core.Interfaces.Services;
 
-public class UserService {
+public class UserService : IUserService {
     private readonly IUserRepository _userRepository;
 
     public UserService(IUserRepository userRepository) {

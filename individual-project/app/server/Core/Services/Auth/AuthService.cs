@@ -5,7 +5,7 @@ using Core.Exceptions;
 using Infrastructure.Repositories;
 using Core.Interfaces.Services;
 
-public class AuthService {
+public class AuthService : IAuthService {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordService _passwordService;
     private readonly IJwtService _jwtService;

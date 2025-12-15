@@ -26,6 +26,13 @@ public static class ErrorMessages
             ErrorCode = "AUTH_003",
             UserFriendlyMessage = "Your email or password is incorrect. Try again or reset your password."
         },
+        ["EMAIL_NOT_VERIFIED"] = new()
+        {
+            Message = "Email is not verified.",
+            StatusCode = 400,
+            ErrorCode = "AUTH_004",
+            UserFriendlyMessage = "Please verify your email before logging in."
+        },
 
         // User errors
         ["EMAIL_EXISTS"] = new()

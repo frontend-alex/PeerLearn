@@ -1,9 +1,10 @@
-namespace Infrastructure.Repositories.Workspace;
-
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence.SQL;
 using Core.Interfaces.repository.workspace;
+using WorkspaceModel = Core.Models.Workspace;
+
+namespace Infrastructure.Repositories.Workspace;
 
 public class WorkspaceRepository : IWorkspaceRepository{
     private readonly ApplicationDbContext _context;
@@ -12,7 +13,7 @@ public class WorkspaceRepository : IWorkspaceRepository{
         _context = context;
     }
 
-    public async Task<Workspace?> GetByIdAsync(int id) {
+    public async Task<WorkspaceModel?> GetByIdAsync(int id) {
         return await _context.Workspaces
             .Include(w => w.Creator)
             .Include(w => w.UserWorkspaces)
@@ -20,20 +21,20 @@ public class WorkspaceRepository : IWorkspaceRepository{
             .FirstOrDefaultAsync(w => w.Id == id);
     }
 
-    public async Task<Workspace> CreateAsync(Workspace workspace) {
+    public async Task<WorkspaceModel> CreateAsync(WorkspaceModel workspace) {
         _context.Workspaces.Add(workspace);
         await _context.SaveChangesAsync();
         return workspace;
     }
 
-    public async Task<Workspace> UpdateAsync(Workspace workspace) {
+    public async Task<WorkspaceModel> UpdateAsync(WorkspaceModel workspace) {
         _context.Workspaces.Update(workspace);
         await _context.SaveChangesAsync();
         return workspace;
     }
 
     public async Task<bool> DeleteAsync(int id) {
-        Workspace? workspace = await _context.Workspaces.FindAsync(id);
+        WorkspaceModel? workspace = await _context.Workspaces.FindAsync(id);
         if (workspace == null) return false;
 
         _context.Workspaces.Remove(workspace);
@@ -43,7 +44,7 @@ public class WorkspaceRepository : IWorkspaceRepository{
         return true;
     }
 
-    public async Task<IEnumerable<Workspace>> GetByUserIdAsync(int userId) {
+    public async Task<IEnumerable<WorkspaceModel>> GetByUserIdAsync(int userId) {
         return await _context.Workspaces
             .Include(w => w.Creator)
             .Include(w => w.UserWorkspaces)

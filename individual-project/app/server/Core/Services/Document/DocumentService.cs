@@ -6,13 +6,14 @@ using Core.DTOs;
 using Core.Enums;
 using Core.Exceptions;
 using Core.Interfaces.repository.Document;
+using Core.Interfaces.Services;
 using Core.Mappers;
 using Core.Models;
 using Core.Utils;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.Workspace;
 
-public class DocumentService {
+public class DocumentService : IDocumentService {
     private readonly IDocumentRepository _documentRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserWorkspaceRepository _userWorkspaceRepository;

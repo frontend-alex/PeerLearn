@@ -1,10 +1,13 @@
 using Core.Exceptions;
+using Core.Models;
 using Core.Utils.Email;
 using Infrastructure.Repositories;
 
 namespace Core.Services.Auth;
 
-public class OtpService {
+using Core.Interfaces.Services;
+
+public class OtpService : IOtpService {
     private readonly IOtpRepository _otpRepository;
     private readonly IUserRepository _userRepository;
     private readonly TimeSpan _otpValidityDuration = TimeSpan.FromMinutes(5);

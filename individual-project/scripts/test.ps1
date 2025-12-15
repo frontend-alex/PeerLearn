@@ -16,10 +16,14 @@ dotnet test Tests/PeerLearn.Tests.csproj --logger "console;verbosity=normal"
 $testExitCode = $LASTEXITCODE
 
 Write-Host ""
+Write-Host "==============================" -ForegroundColor Cyan
 if ($testExitCode -eq 0) {
-    Write-Host "All tests passed!" -ForegroundColor Green
+    Write-Host "SUCCESS: All tests passed!" -ForegroundColor Green
+    Write-Host "Exit Code: $testExitCode" -ForegroundColor Green
 } else {
-    Write-Host "Tests failed with exit code: $testExitCode" -ForegroundColor Red
+    Write-Host "FAILED: Tests failed!" -ForegroundColor Red
+    Write-Host "Exit Code: $testExitCode" -ForegroundColor Red
 }
+Write-Host "==============================" -ForegroundColor Cyan
 
 exit $testExitCode

@@ -3,14 +3,14 @@ namespace API.Controllers.Document;
 using API.Models;
 using API.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
-using Core.Services.Document;
+using Core.Interfaces.Services;
 using API.Contracts.Document;
 using API.Mappers;
 
 public class DocumentController : BaseController {
-    private readonly DocumentService _documentService;
+    private readonly IDocumentService _documentService;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(IDocumentService documentService) {
         _documentService = documentService;
     }
 

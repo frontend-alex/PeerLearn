@@ -18,10 +18,18 @@ public class ApplicationDbContext : DbContext {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
+        // NOTE: Our production database is SQL Server, but integration tests use SQLite in-memory.
+        // SQLite has strict rules for AUTOINCREMENT: it must be on "INTEGER PRIMARY KEY".
+        // When we force column types like "int", EF may emit "int PRIMARY KEY AUTOINCREMENT",
+        // which SQLite rejects ("AUTOINCREMENT is only allowed on an INTEGER PRIMARY KEY").
+        var isSqlite = Database.ProviderName?.Contains("Sqlite") == true;
+        var intColumnType = isSqlite ? "INTEGER" : "int";
+        var longTextColumnType = isSqlite ? "TEXT" : "nvarchar(max)";
+
         // Configure User entity
         modelBuilder.Entity<User>(entity => {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnType("int").ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).HasColumnType(intColumnType).ValueGeneratedOnAdd();
             entity.Property(e => e.Username).HasMaxLength(64);
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(64);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(64);
@@ -49,14 +57,14 @@ public class ApplicationDbContext : DbContext {
         // Configure Workspace entity
         modelBuilder.Entity<Workspace>(entity => {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnType("int").ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).HasColumnType(intColumnType).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).IsRequired().HasMaxLength(128);
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.Visibility).IsRequired().HasConversion<string>();
-            entity.Property(e => e.CreatedBy).IsRequired().HasColumnType("int");
+            entity.Property(e => e.CreatedBy).IsRequired().HasColumnType(intColumnType);
             entity.Property(e => e.ColorHex).HasMaxLength(16);
-            entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
-            entity.Property(e => e.UpdatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Creator)
                 .WithMany()
@@ -67,10 +75,10 @@ public class ApplicationDbContext : DbContext {
         // Configure UserWorkspace entity
         modelBuilder.Entity<UserWorkspace>(entity => {
             entity.HasKey(e => new { e.UserId, e.WorkspaceId });
-            entity.Property(e => e.UserId).HasColumnType("int");
-            entity.Property(e => e.WorkspaceId).HasColumnType("int");
+            entity.Property(e => e.UserId).HasColumnType(intColumnType);
+            entity.Property(e => e.WorkspaceId).HasColumnType(intColumnType);
             entity.Property(e => e.Role).IsRequired().HasConversion<string>();
-            entity.Property(e => e.JoinedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.JoinedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.User)
                 .WithMany()
@@ -88,13 +96,13 @@ public class ApplicationDbContext : DbContext {
         // Configure WorkspaceInvitation entity
         modelBuilder.Entity<WorkspaceInvitation>(entity => {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnType("int").ValueGeneratedOnAdd();
-            entity.Property(e => e.WorkspaceId).HasColumnType("int");
-            entity.Property(e => e.InvitedBy).HasColumnType("int");
+            entity.Property(e => e.Id).HasColumnType(intColumnType).ValueGeneratedOnAdd();
+            entity.Property(e => e.WorkspaceId).HasColumnType(intColumnType);
+            entity.Property(e => e.InvitedBy).HasColumnType(intColumnType);
             entity.Property(e => e.InvitedEmail).IsRequired().HasMaxLength(320);
             entity.Property(e => e.Token).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Status).IsRequired().HasConversion<string>();
-            entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Workspace)
                 .WithMany(w => w.Invitations)
@@ -112,25 +120,25 @@ public class ApplicationDbContext : DbContext {
         // Configure Document entity
         modelBuilder.Entity<Document>(entity => {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasColumnType("int").ValueGeneratedOnAdd();
-            entity.Property(e => e.WorkspaceId).HasColumnType("int");
-            entity.Property(e => e.CreatedBy).HasColumnType("int");
+            entity.Property(e => e.Id).HasColumnType(intColumnType).ValueGeneratedOnAdd();
+            entity.Property(e => e.WorkspaceId).HasColumnType(intColumnType);
+            entity.Property(e => e.CreatedBy).HasColumnType(intColumnType);
             entity.Property(e => e.Title).HasMaxLength(256);
             entity.Property(e => e.Kind).IsRequired().HasConversion<string>();
             entity.Property(e => e.YDocId).IsRequired().HasMaxLength(128);
             entity.Property(e => e.ColorHex).HasMaxLength(16);
-            entity.Property(e => e.Content).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Content).HasColumnType(longTextColumnType);
             entity.Property(e => e.IsArchived).IsRequired().HasDefaultValue(false);
             entity.Property(e => e.Visibility).IsRequired().HasConversion<string>();
             entity.Property(e => e.CreatedAt)
                 .IsRequired()
-                .HasDefaultValueSql("SYSUTCDATETIME()")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasConversion(
                     v => v.ToUniversalTime(), // Store: ensure UTC
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Read: mark as UTC (database stores UTC)
                 );
             entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("SYSUTCDATETIME()")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasConversion(
                     v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null, // Store: ensure UTC
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null // Read: mark as UTC (database stores UTC)

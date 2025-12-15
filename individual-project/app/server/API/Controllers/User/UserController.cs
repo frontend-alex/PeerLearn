@@ -6,20 +6,20 @@ using API.Models;
 using Core.DTOs;
 using API.Mappers;
 using API.Contracts.User;
-using Core.Services.User;
+using Core.Interfaces.Services;
 using API.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 
 
 public class UserController : BaseController {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public UserController(UserService userService) {
+    public UserController(IUserService userService) {
         _userService = userService;
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] int limit = 8) {
+    public async Task<IActionResult> SearchUsers([FromQuery] string? query, [FromQuery] int limit = 8) {
         IEnumerable<UserDto> users = await _userService.SearchUsers(query, limit);
 
         IEnumerable<UserResponse> response = users.Select(UserMapper.ToGetUserResponse);
@@ -47,7 +47,14 @@ public class UserController : BaseController {
     }
 
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateUser([FromBody] Dictionary<string, object> updates) {
+    public async Task<IActionResult> UpdateUser([FromBody] Dictionary<string, object>? updates) {
+        if (updates == null || updates.Count == 0) {
+            return BadRequest(new ApiResponse<EmptyResponse> {
+                Success = false,
+                Message = "Invalid request",
+                Data = null
+            });
+        }
         int userId = GetCurrentUserId();
 
         await _userService.UpdateUser(userId, updates);

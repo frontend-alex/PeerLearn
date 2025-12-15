@@ -7,15 +7,15 @@ namespace API.Controllers.Workspace;
 using API.Models;
 using API.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
-using Core.Services.Workspace;
+using Core.Interfaces.Services;
 using Core.DTOs;
 using API.Contracts.Workspace;
 using API.Mappers;
 
 public class WorkspaceController : BaseController {
-    private readonly WorkspaceService _workspaceService;
+    private readonly IWorkspaceService _workspaceService;
 
-    public WorkspaceController(WorkspaceService workspaceService) {
+    public WorkspaceController(IWorkspaceService workspaceService) {
         _workspaceService = workspaceService;
     }
 

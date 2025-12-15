@@ -3,6 +3,7 @@ namespace Core.Services.Workspace;
 using Core.DTOs;
 using Core.Models;
 using Core.Enums;
+using Core.Interfaces.Services;
 using Core.Mappers;
 using Core.Exceptions;
 using Core.Utils;
@@ -10,7 +11,7 @@ using Infrastructure.Repositories;
 using Core.Interfaces.repository.workspace;
 using Infrastructure.Repositories.Workspace;
 
-public class WorkspaceService {
+public class WorkspaceService : IWorkspaceService {
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IUserWorkspaceRepository _userWorkspaceRepository;
     private readonly IUserRepository _userRepository;

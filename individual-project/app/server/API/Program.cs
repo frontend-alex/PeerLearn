@@ -58,11 +58,11 @@ builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 // Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<WorkspaceService>();
-builder.Services.AddScoped<DocumentService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<OtpService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
 
 builder.Services.AddSwaggerServices();
 

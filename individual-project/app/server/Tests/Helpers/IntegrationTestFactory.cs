@@ -2,20 +2,22 @@ using Infrastructure.Persistence.SQL;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Data.Sqlite;
 using System.Linq;
 
 namespace PeerLearn.Tests.Helpers;
 
 public class IntegrationTestFactory : WebApplicationFactory<Program>
 {
-    private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
+    private SqliteConnection? _connection;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
         
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
             // Remove ALL Entity Framework and DbContext-related service descriptors
             var descriptorsToRemove = services.Where(d =>
@@ -29,10 +31,14 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
-            // Add DbContext using a unique in-memory database for testing
+            // Use an in-memory SQLite database for integration tests (self-contained, no external SQL Server needed)
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+
+            // Add DbContext using SQLite
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseInMemoryDatabase(_databaseName);
+                options.UseSqlite(_connection);
             });
         });
     }
@@ -41,10 +47,11 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>
     {
         var client = base.CreateClient();
         
-        // Ensure database is created before running tests
+        // Reset database for each test instance
         using (var scope = Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
         }
         
@@ -55,7 +62,7 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>
     {
         if (disposing)
         {
-            // Clean up the in-memory database
+            // Clean up the database
             try
             {
                 using (var scope = Services.CreateScope())
@@ -63,6 +70,15 @@ public class IntegrationTestFactory : WebApplicationFactory<Program>
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     dbContext.Database.EnsureDeleted();
                 }
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+
+            try
+            {
+                _connection?.Dispose();
             }
             catch
             {

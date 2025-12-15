@@ -1,8 +1,8 @@
-namespace Infrastructure.Repositories.Workspace;
-
 using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Persistence.SQL;
+
+namespace Infrastructure.Repositories.Workspace;
 
 
 public class UserWorkspaceRepository : IUserWorkspaceRepository {
