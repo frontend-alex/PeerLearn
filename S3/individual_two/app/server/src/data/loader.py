@@ -1,8 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
-from src.config.config import RAW_CSV
-from src.utils import resolve_path, validate_csv
+from app.server.src.config.config import RAW_CSV
+from app.server.src.utils import resolve_path, validate_csv
 
 
 def load(path: str | Path | None = RAW_CSV) -> pd.DataFrame:

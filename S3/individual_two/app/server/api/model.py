@@ -2,8 +2,8 @@ import pickle
 
 import pandas as pd
 
-from api.dto import MigraineInput
-from src.config.config import FEATURES, SAVED_MODEL_RF, SAVED_MODELS_DIR
+from app.server.api.dto import MigraineInput
+from app.server.src.config.config import FEATURES, SAVED_MODEL_RF, SAVED_MODELS_DIR
 
 
 def predict_migraine_type(payload: MigraineInput) -> str:

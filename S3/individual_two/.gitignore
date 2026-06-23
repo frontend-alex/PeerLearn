@@ -1,3 +1,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Local environments and dependencies
+server/venv/
+server/.venv/
+web/node_modules/
+
+# OS metadata
+.DS_Store

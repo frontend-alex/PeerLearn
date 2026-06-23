@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from api.dto import MigraineInput, MigraineOutput
-from api.model import predict_migraine_type
+from app.server.api.dto import MigraineInput, MigraineOutput
+from app.server.api.model import predict_migraine_type
 
 
 app = FastAPI(title="Individual Two API")

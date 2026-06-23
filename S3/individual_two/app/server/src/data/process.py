@@ -1,8 +1,8 @@
 import pandas as pd
 
-from src.data.loader import load
-from src.utils.file import save_csv
-from src.config.config import FEATURES, PROCESSED_CSV, TARGET
+from app.server.src.data.loader import load
+from app.server.src.utils.file import save_csv
+from app.server.src.config.config import FEATURES, PROCESSED_CSV, TARGET
 
 def process(
     df: pd.DataFrame | None = None, 

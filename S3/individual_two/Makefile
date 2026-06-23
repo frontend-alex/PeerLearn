@@ -1,4 +1,11 @@
-.PHONY: dev devw server server-windows web
+.PHONY: install dev devw server server-windows web
+
+APP_DIR := app
+SERVER_DIR := $(APP_DIR)/server
+WEB_DIR := $(APP_DIR)/web
+
+install:
+	bash ./scripts/install.sh
 
 dev:
 	$(MAKE) -j2 server web
@@ -7,10 +14,10 @@ devw:
 	$(MAKE) -j2 server-windows web
 
 server-windows:
-	cd server && .venv/Scripts/activate uvicorn.exe api.main:app --reload
+	cd $(SERVER_DIR) && .venv/Scripts/activate uvicorn.exe api.main:app --reload
 
 server:
-	cd server && source venv/bin/activate && uvicorn api.main:app --reload
+	cd $(SERVER_DIR) && source venv/bin/activate && uvicorn api.main:app --reload
 
 web:
-	cd web && npm run dev
+	cd $(WEB_DIR) && npm run dev

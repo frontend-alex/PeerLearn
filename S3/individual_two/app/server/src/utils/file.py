@@ -3,7 +3,7 @@ import pandas as pd
 
 from pathlib import Path
 
-from src.config.config import SAVED_MODELS_DIR
+from app.server.src.config.config import SAVED_MODELS_DIR
 
 def resolve_path(override: str | Path | None, default: Path) -> Path:
     return Path(override) if override is not None else default
